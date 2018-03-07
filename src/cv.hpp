@@ -45,21 +45,21 @@ void main() {
   constexpr auto loopcnt = 100;
   std::promise<void> start_promise;
   auto start_future = start_promise.get_future();
-  auto producer_1 = std::async(std::launch::async, produce, std::ref(start_future), loopcnt);
-  auto producer_2 = std::async(std::launch::async, produce, std::ref(start_future), loopcnt);
-  auto consumer_1 = std::async(std::launch::async, consume, std::ref(start_future));
-  auto consumer_2 = std::async(std::launch::async, consume, std::ref(start_future));
+  std::thread producer_1(produce, std::ref(start_future), loopcnt);
+  std::thread producer_2(produce, std::ref(start_future), loopcnt);
+  std::thread consumer_1(consume, std::ref(start_future));
+  std::thread consumer_2(consume, std::ref(start_future));
   std::this_thread::sleep_for(1s);
   start_promise.set_value();
-  producer_1.wait();
-  producer_2.wait();
+  producer_1.join();
+  producer_2.join();
   {
     std::lock_guard<std::mutex> lock(mut);
     que.push(unsigned(-1));
   }
   cond_var.notify_all();
-  consumer_1.wait();
-  consumer_2.wait();
+  consumer_1.join();
+  consumer_2.join();
   assert(que.size() == 1 && que.front() == unsigned(-1));
 }
 
