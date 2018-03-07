@@ -1,5 +1,5 @@
-#include <iostream>
+#include "cv.hpp"
 
 int main() {
-  std::cout << "Test" << std::endl;
+  cv::main();
 }
