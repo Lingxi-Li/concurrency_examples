@@ -9,7 +9,7 @@
 
 namespace cv {
 
-using namespace std::chrono;
+using namespace std::literals;
 
 std::mutex mut;
 std::condition_variable cond_var;
